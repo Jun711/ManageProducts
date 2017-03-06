@@ -2,6 +2,7 @@
 	controllerName="opensap.manageproducts.controller.Worklist"
 	xmlns="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:l="sap.ui.layout"
 	xmlns:semantic="sap.m.semantic">
 
 	<semantic:FullscreenPage
@@ -102,7 +103,9 @@
 								<cells>
 									<ObjectIdentifier
 										title="{ProductID}"
-										text="{Name}"/>
+										text="{Name}"
+										titleActive="true" 
+										titlePress="onShowDetailPopover"/>
 									<Text text="{SupplierName}"/>
 									<Link
 										text="{ToSupplier/WebAddress}"
@@ -125,8 +128,7 @@
 		<semantic:sendEmailAction>
 			<semantic:SendEmailAction id="shareEmail" press="onShareEmailPress"/>
 		</semantic:sendEmailAction>
-
-
+		
 	</semantic:FullscreenPage>
 
 </mvc:View>
