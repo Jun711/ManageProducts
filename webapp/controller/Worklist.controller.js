@@ -10,7 +10,13 @@ sap.ui.define([
 		return BaseController.extend("opensap.manageproducts.controller.Worklist", {
 
 			formatter: formatter,
-
+			
+			_mFilters: {
+				// case sensitive
+				cheap: [new Filter("Price", "LT", 100)], // LT is less than operator
+				moderate: [new Filter("Price", "BT", 100, 1000)],
+				expensive: [new Filter("Price", "GT", 1000)]
+			},
 			/* =========================================================== */
 			/* lifecycle methods                                           */
 			/* =========================================================== */
@@ -39,7 +45,10 @@ sap.ui.define([
 					shareSendEmailSubject: this.getResourceBundle().getText("shareSendEmailWorklistSubject"),
 					shareSendEmailMessage: this.getResourceBundle().getText("shareSendEmailWorklistMessage", [location.href]),
 					tableNoDataText : this.getResourceBundle().getText("tableNoDataText"),
-					tableBusyDelay : 0
+					tableBusyDelay : 0,
+					cheap: 0,
+					moderate: 0,
+					expensive: 0
 				});
 				this.setModel(oViewModel, "worklistView");
 
@@ -69,11 +78,26 @@ sap.ui.define([
 				// update the worklist's object counter after the table update
 				var sTitle,
 					oTable = oEvent.getSource(),
-					iTotalItems = oEvent.getParameter("total");
+					iTotalItems = oEvent.getParameter("total"),
+					oModel = this.getModel(),
+					oViewModel = this.getModel("worklistView");
+					
 				// only update the counter if the length is final and
 				// the table is not empty
 				if (iTotalItems && oTable.getBinding("items").isLengthFinal()) {
 					sTitle = this.getResourceBundle().getText("worklistTableTitleCount", [iTotalItems]);
+					
+					// iterate the filters and request the count from the server
+					jQuery.each(this._mFilters, function (sFilterKey, oFilter) {
+						// it is called 3 times but in a batch request
+						oModel.read("/ProductSet/$count", { // oData parameter count
+							filters: oFilter,
+							success: function (oData) {
+								var sPath = "/" + sFilterKey;
+								oViewModel.setProperty(sPath, oData);
+							}
+						});
+					});
 				} else {
 					sTitle = this.getResourceBundle().getText("worklistTableTitle");
 				}
@@ -128,6 +152,23 @@ sap.ui.define([
 			onRefresh : function () {
 				var oTable = this.byId("table");
 				oTable.getBinding("items").refresh();
+			},
+			
+			/**
+			 * Event handler when a filter tab gets pressed
+			 * @param {sap.ui.base.Event} oEvent the filter tab event
+			 * @public
+			 */
+			onQuickFilter: function(oEvent) {
+				var sKey = oEvent.getParameter("key"),
+					oFilter = this._mFilters[sKey],
+					oTable = this.byId("table"),
+					oBinding = oTable.getBinding("items"); // name of aggregation
+				if (oFilter) {
+					oBinding.filter(oFilter);
+				} else {
+					oBinding.filter([]);	
+				}
 			},
 
 			/* =========================================================== */
