@@ -64,7 +64,15 @@ sap.ui.define([
 			/* =========================================================== */
 			/* event handlers                                              */
 			/* =========================================================== */
-
+			
+			/**
+			 * Event handler when the add button gets pressed
+			 * @public
+			 */
+			onAdd: function() {
+				this.getRouter().navTo("add");
+			},
+			
 			/**
 			 * Triggered by the table's 'updateFinished' event: after new table
 			 * data is available, this handler method updates the table counter.

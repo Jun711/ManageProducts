@@ -105,6 +105,11 @@
 					"target": [
 						"object"
 					]
+				},
+				{
+					"pattern" : "AddProduct",
+					"name" : "add",
+					"target" : "add"
 				}
 			],
 			"targets": {
@@ -125,6 +130,11 @@
 				"notFound": {
 					"viewName": "NotFound",
 					"viewId": "notFound"
+				},
+				"add" : {
+					"viewName": "Add",
+					"viewId": "add",
+					"viewLevel": 3
 				}
 			}
 		}
